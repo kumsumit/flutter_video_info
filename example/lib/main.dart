@@ -17,8 +17,9 @@ class _MyAppState extends State<MyApp> {
       Permission.photos,
       Permission.storage,
     ].request();
+    debugPrint(statuses.toString());
   }
-
+  
   final videoInfo = FlutterVideoInfo();
 
   @override

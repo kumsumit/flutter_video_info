@@ -8,7 +8,7 @@ buildscript {
     }
 
     dependencies {
-        classpath 'com.android.tools.build:gradle:8.8.0'
+        classpath 'com.android.tools.build:gradle:8.13.2'
     }
 }
 
@@ -26,7 +26,7 @@ android {
     if (project.android.hasProperty("namespace")) {
         namespace 'com.example.flutter_video_info'
     }
-    compileSdk 35
+    compileSdk 36
 
     defaultConfig {
         minSdk 21
