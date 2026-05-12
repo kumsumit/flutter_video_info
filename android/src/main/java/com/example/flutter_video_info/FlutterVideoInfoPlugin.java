@@ -12,7 +12,7 @@ import org.json.JSONObject;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.Locale;
-import java.io.*;
+import java.io.File;
 
 import io.flutter.embedding.engine.plugins.FlutterPlugin;
 import io.flutter.plugin.common.MethodCall;
@@ -24,14 +24,15 @@ import io.flutter.plugin.common.MethodChannel.Result;
  * FlutterVideoInfoPlugin
  */
 public class FlutterVideoInfoPlugin implements FlutterPlugin, MethodCallHandler {
-    public  Context context;
+    private Context context;
+    private MethodChannel channel;
 
     @Override
     public void onAttachedToEngine(@NonNull FlutterPluginBinding flutterPluginBinding) {
-        final MethodChannel channel = new MethodChannel(flutterPluginBinding.getBinaryMessenger(),
+        channel = new MethodChannel(flutterPluginBinding.getBinaryMessenger(),
                 "flutter_video_info");
-        channel.setMethodCallHandler(new FlutterVideoInfoPlugin());
         context = flutterPluginBinding.getApplicationContext();
+        channel.setMethodCallHandler(this);
     }
 
     @Override
@@ -46,55 +47,85 @@ public class FlutterVideoInfoPlugin implements FlutterPlugin, MethodCallHandler 
 
     @Override
     public void onDetachedFromEngine(@NonNull FlutterPluginBinding binding) {
+        if (channel != null) {
+            channel.setMethodCallHandler(null);
+            channel = null;
+        }
+        context = null;
     }
 
     String getVidInfo(String path) {
+        if (path == null) {
+            path = "";
+        }
         File file = new File(path);
         boolean isFileExists=file.exists();
-        String author,dateString,mimeType,location,frameRateStr,widthStr,heightStr,durationStr,orientation;
+        String title,author,album,artist,genre,dateString,mimeType,location,frameRateStr,widthStr,heightStr,durationStr,orientation,bitrateStr,hasAudioStr,frameCountStr;
         double filesize;
         if(isFileExists){
             MediaMetadataRetriever mediaRetriever = new MediaMetadataRetriever();
             try {
                 mediaRetriever.setDataSource(context, Uri.fromFile(file));
+
+                title = getData(MediaMetadataRetriever.METADATA_KEY_TITLE, mediaRetriever);
+                author = getData(MediaMetadataRetriever.METADATA_KEY_AUTHOR, mediaRetriever);
+                album = getData(MediaMetadataRetriever.METADATA_KEY_ALBUM, mediaRetriever);
+                artist = getData(MediaMetadataRetriever.METADATA_KEY_ARTIST, mediaRetriever);
+                genre = getData(MediaMetadataRetriever.METADATA_KEY_GENRE, mediaRetriever);
+                dateString = getData(MediaMetadataRetriever.METADATA_KEY_DATE, mediaRetriever);
+                dateString = formatDate(dateString);
+                mimeType = getData(MediaMetadataRetriever.METADATA_KEY_MIMETYPE, mediaRetriever);
+                location = getData(MediaMetadataRetriever.METADATA_KEY_LOCATION, mediaRetriever);
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+                    frameRateStr = getData(MediaMetadataRetriever.METADATA_KEY_CAPTURE_FRAMERATE, mediaRetriever);
+                }else{
+                    frameRateStr="";
+                }
+                durationStr = getData(MediaMetadataRetriever.METADATA_KEY_DURATION, mediaRetriever);
+                widthStr = getData(MediaMetadataRetriever.METADATA_KEY_VIDEO_WIDTH, mediaRetriever);
+                heightStr = getData(MediaMetadataRetriever.METADATA_KEY_VIDEO_HEIGHT, mediaRetriever);
+                filesize = file.length();
+                orientation = getData(MediaMetadataRetriever.METADATA_KEY_VIDEO_ROTATION, mediaRetriever);
+                bitrateStr = getData(MediaMetadataRetriever.METADATA_KEY_BITRATE, mediaRetriever);
+                hasAudioStr = getData(MediaMetadataRetriever.METADATA_KEY_HAS_AUDIO, mediaRetriever);
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) {
+                    frameCountStr = getData(MediaMetadataRetriever.METADATA_KEY_VIDEO_FRAME_COUNT, mediaRetriever);
+                } else {
+                    frameCountStr = "";
+                }
             } catch (Exception e) {
                 e.printStackTrace();
-            }
-            
-
-            author = getData(MediaMetadataRetriever.METADATA_KEY_AUTHOR, mediaRetriever);
-            dateString = getData(MediaMetadataRetriever.METADATA_KEY_DATE, mediaRetriever);
-            try {
-                SimpleDateFormat readFormat = new SimpleDateFormat("yyyyMMdd'T'HHmmss.SSS", Locale.getDefault());
-                Date date = readFormat.parse(dateString);
-                SimpleDateFormat outFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.getDefault());
-                assert date != null;
-                dateString = outFormat.format(date);
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
-
-            mimeType = getData(MediaMetadataRetriever.METADATA_KEY_MIMETYPE, mediaRetriever);
-            location = getData(MediaMetadataRetriever.METADATA_KEY_LOCATION, mediaRetriever);
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-                frameRateStr = getData(MediaMetadataRetriever.METADATA_KEY_CAPTURE_FRAMERATE, mediaRetriever);
-            }else{
+                title="";
+                author="";
+                album="";
+                artist="";
+                genre="";
+                dateString="";
+                mimeType="";
+                location="";
                 frameRateStr="";
-            }
-            durationStr = getData(MediaMetadataRetriever.METADATA_KEY_DURATION, mediaRetriever);
-            widthStr = getData(MediaMetadataRetriever.METADATA_KEY_VIDEO_WIDTH, mediaRetriever);
-            heightStr = getData(MediaMetadataRetriever.METADATA_KEY_VIDEO_HEIGHT, mediaRetriever);
-            filesize = file.length();
-            orientation = getData(MediaMetadataRetriever.METADATA_KEY_VIDEO_ROTATION, mediaRetriever);
-
-            try {
-                 mediaRetriever.release();
-            } catch (Exception e) {
-                e.printStackTrace();
+                widthStr="";
+                heightStr="";
+                durationStr="";
+                orientation="";
+                bitrateStr="";
+                hasAudioStr="";
+                frameCountStr="";
+                filesize = file.length();
+            } finally {
+                try {
+                     mediaRetriever.release();
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
             }
             
         }else{
+            title="";
             author="";
+            album="";
+            artist="";
+            genre="";
             dateString="";
             mimeType="";
             location="";
@@ -103,23 +134,33 @@ public class FlutterVideoInfoPlugin implements FlutterPlugin, MethodCallHandler 
             heightStr="";
             durationStr="";
             orientation="";
+            bitrateStr="";
+            hasAudioStr="";
+            frameCountStr="";
             filesize=0;
         }
 
         JSONObject json = new JSONObject();
         try {
             json.put("path", path);
-            json.put("mimetype", mimeType);
+            json.put("title", title);
+            json.put("mimeType", mimeType);
             json.put("author", author);
+            json.put("album", album);
+            json.put("artist", artist);
+            json.put("genre", genre);
             json.put("date", dateString);
             json.put("width", widthStr);
             json.put("height", heightStr);
             json.put("location", location);
-            json.put("framerate", frameRateStr);
+            json.put("frameRate", frameRateStr);
             json.put("duration", durationStr);
-            json.put("filesize", filesize);
+            json.put("fileSize", filesize);
             json.put("orientation", orientation);
-            json.put("isfileexist",isFileExists);
+            json.put("bitrate", bitrateStr);
+            json.put("hasAudio", "yes".equalsIgnoreCase(hasAudioStr));
+            json.put("frameCount", frameCountStr);
+            json.put("isFileExist",isFileExists);
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -129,9 +170,24 @@ public class FlutterVideoInfoPlugin implements FlutterPlugin, MethodCallHandler 
 
     String getData(int key, MediaMetadataRetriever mediaRetriever) {
         try {
-            return mediaRetriever.extractMetadata(key);
+            String value = mediaRetriever.extractMetadata(key);
+            return value == null ? "" : value;
         } catch (Exception e) {
-            return null;
+            return "";
+        }
+    }
+
+    String formatDate(String dateString) {
+        if (dateString == null || dateString.isEmpty()) {
+            return "";
+        }
+        try {
+            SimpleDateFormat readFormat = new SimpleDateFormat("yyyyMMdd'T'HHmmss.SSS", Locale.getDefault());
+            Date date = readFormat.parse(dateString);
+            SimpleDateFormat outFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.getDefault());
+            return date == null ? dateString : outFormat.format(date);
+        } catch (Exception e) {
+            return dateString;
         }
     }
 

@@ -11,15 +11,22 @@ of a video file.
 `title`
 `path`
 `author`
-`mimetype`
+`mimeType`
 `height`
 `width`
-`filesize`
+`fileSize`
 `duration`
 `orientation`
 `date`
-`framerate`
+`frameRate`
 `location`
+`album`
+`artist`
+`genre`
+`bitrate`
+`hasAudio`
+`frameCount`
+`isFileExist`
 
 
 
@@ -41,7 +48,9 @@ String videoFilePath = "your_video_file_path";
 var info = await videoInfo.getVideoInfo(videoFilePath);
 
 //String title = info.title;   to get title of video
-//similarly path,author,mimetype,height,width,filesize,duration,orientation,date,framerate,location can be extracted.
+//similarly path, author, mimeType, height, width, fileSize, duration, orientation,
+//date, frameRate, location, album, artist, genre, bitrate, hasAudio, frameCount,
+//and isFileExist can be extracted.
 
 ```
 
@@ -57,4 +66,3 @@ NSPhotoLibraryUsageDescription - describe why your app needs permission for the 
     
 ## PR is welcomed
   Anyone can pr for these  <a href="https://github.com/anandnet/flutter_video_info/issues">issues</a></br>
-

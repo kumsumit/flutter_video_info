@@ -23,12 +23,14 @@ class _MyAppState extends State<MyApp> {
     var a = await flutterVideoInfo.getVideoInfo(videoFilePath);
     setState(() {
       info =
-          "title=> ${a.title}\npath=> ${a.path}\nauthor=> ${a.author}\nmimetype=> ${a.mimetype}";
+          "title=> ${a.title}\npath=> ${a.path}\nauthor=> ${a.author}\nmimeType=> ${a.mimeType}";
       info +=
-          "\nheight=> ${a.height}\nwidth=> ${a.width}\nfileSize=> ${a.filesize} Bytes\nduration=> ${a.duration} milisec";
+          "\nheight=> ${a.height}\nwidth=> ${a.width}\nfileSize=> ${a.fileSize} Bytes\nduration=> ${a.duration} milisec";
       info +=
-          "\norientation=> ${a.orientation}\ndate=> ${a.date}\nframerate=> ${a.framerate}";
+          "\norientation=> ${a.orientation}\ndate=> ${a.date}\nframeRate=> ${a.frameRate}";
       info += "\nlocation=> ${a.location}";
+      info +=
+          "\nbitrate=> ${a.bitrate}\nhasAudio=> ${a.hasAudio}\nframeCount=> ${a.frameCount}";
     });
   }
 

@@ -19,7 +19,7 @@ class _MyAppState extends State<MyApp> {
     ].request();
     debugPrint(statuses.toString());
   }
-  
+
   final videoInfo = FlutterVideoInfo();
 
   @override
@@ -44,12 +44,14 @@ class _MyAppState extends State<MyApp> {
     var a = await videoInfo.getVideoInfo(videoFilePath);
     setState(() {
       info =
-          "title=> ${a?.title}\npath=> ${a?.path}\nauthor=> ${a?.author}\nmimetype=> ${a?.mimetype}";
+          "title=> ${a.title}\npath=> ${a.path}\nauthor=> ${a.author}\nmimeType=> ${a.mimeType}";
       info +=
-          "\nheight=> ${a?.height}\nwidth=> ${a?.width}\nfileSize=> ${a?.filesize} Bytes\nduration=> ${a?.duration} milisec";
+          "\nheight=> ${a.height}\nwidth=> ${a.width}\nfileSize=> ${a.fileSize} Bytes\nduration=> ${a.duration} milisec";
       info +=
-          "\norientation=> ${a?.orientation}\ndate=> ${a?.date}\nframerate=> ${a?.framerate}";
-      info += "\nlocation=> ${a?.location}";
+          "\norientation=> ${a.orientation}\ndate=> ${a.date}\nframeRate=> ${a.frameRate}";
+      info += "\nlocation=> ${a.location}";
+      info +=
+          "\nbitrate=> ${a.bitrate}\nhasAudio=> ${a.hasAudio}\nframeCount=> ${a.frameCount}";
     });
   }
 
@@ -59,18 +61,13 @@ class _MyAppState extends State<MyApp> {
       home: Scaffold(
         floatingActionButtonLocation: FloatingActionButtonLocation.centerFloat,
         floatingActionButton: FloatingActionButton.extended(
-            backgroundColor: Colors.white,
-            label: Text(
-              "Get Info",
-              style: TextStyle(color: Colors.black),
-            ),
-            icon: Icon(
-              Icons.video_call_outlined,
-              color: Colors.purple,
-            ),
-            onPressed: () {
-              getVideoInfo();
-            }),
+          backgroundColor: Colors.white,
+          label: Text("Get Info", style: TextStyle(color: Colors.black)),
+          icon: Icon(Icons.video_call_outlined, color: Colors.purple),
+          onPressed: () {
+            getVideoInfo();
+          },
+        ),
         appBar: AppBar(
           centerTitle: true,
           backgroundColor: Colors.purple,
@@ -78,12 +75,7 @@ class _MyAppState extends State<MyApp> {
         ),
         body: Padding(
           padding: const EdgeInsets.all(30.0),
-          child: Center(
-            child: Text(
-              info,
-              style: TextStyle(fontSize: 21),
-            ),
-          ),
+          child: Center(child: Text(info, style: TextStyle(fontSize: 21))),
         ),
       ),
     );
