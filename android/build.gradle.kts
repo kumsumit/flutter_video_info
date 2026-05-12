@@ -14,13 +14,13 @@ repositories {
 
 android {
     namespace = "com.example.flutter_video_info"
-    compileSdk 37
+    compileSdk = 37
 
     defaultConfig {
-        minSdk 24
-        testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
+        minSdk = 24
+        testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
     }
-    lintOptions {
-        disable 'InvalidPackage'
+    lint {
+        disable += "InvalidPackage"
     }
 }
